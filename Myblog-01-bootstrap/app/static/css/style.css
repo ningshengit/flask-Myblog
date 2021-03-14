@@ -1,0 +1,13 @@
+.navbar {
+    background-color:#126bae;
+}
+.navbar-nav>li>a {
+    color: #57c3c2;
+}
+.float-left {
+    float: left !important
+}
+
+.float-right {
+    float: right !important
+}
