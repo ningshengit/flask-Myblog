@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block app_content %}
+    <div class="page-header">
+        <h1>{{ post.title }}</h1>
+        <small>
+            Tag: <a href="">{{ post.tag.name }}</a><br>
+            Date: {{ post.timestamp }}
+        </small>
+    </div>
+    <div class="row">
+        <div class="col-sm-8">
+
+            {{ post.body|safe }}
+            <hr>
+            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target=".postLinkModal">Share
+            </button>
+            <!-- share modal -->
+            <div class="modal fade postLinkModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Permalink</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <input type="text" class="form-control"
+                                       value="{{ url_for('.show_post', post_id=post.id, _external=True) }}" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 评论前端 -->
+            <div class="comments" id="comments">
+                <h3>{{ pagination.total }} Comments
+                    <small>
+                        <a href="{{ url_for('.show_post', post_id=post.id, page=pagination.pages or 1) }}#comments">
+                            latest</a>
+                    </small>
+                </h3>
+                 {% if comments %}
+                    <ul class="list-group">
+                        {% for comment in comments %}
+                            {% if comment.reviewed %}
+                                <li class="list-group-item list-group-item-action flex-column">
+                                    <div id="comm" class="flex-container">
+                                        <h5 class="mb-1">
+                                            <a href="#" target="_blank">
+                                                {% if comment.from_admin %} 
+                                                    {{ admin.username }}
+                                                {% else %}
+                                                    {{ comment.author }}
+                                                {% endif %}
+                                            </a>
+                                                {% if comment.from_admin %}
+                                                <span class="badge badge-primary">管理员</span>
+                                                {% endif %}
+                                                {% if comment.replied %}
+                                                <span class="badge badge-light">回复</span>
+                                                {% endif %}
+                                        </h5>
+                                        <small data-toggle="tooltip" data-placement="top" data-delay="500"
+                                               data-timestamp="{{ comment.timestamp.strftime('%Y-%m-%dT%H:%M:%SZ') }}">
+                                              {{ comment.timestamp }}
+                                        </small>
+                                    </div>
+                                     {% if comment.replied %}
+                                        <p class="alert alert-info reply-body">{{ comment.replied.author }}:
+                                            <br>{{ comment.replied.body }}
+                                        </p>
+                                    {%- endif -%}
+
+                                    <p class="mb-1">{{ comment.body }}</p>
+                                    <div class="text-right">
+                                        <a class="btn btn-light btn-sm"
+                                           href="{{ url_for('blog.reply_comment',  comment_id=comment.id) }}">回复</a>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="tip"><h5>No comments.</h5></div>
+                {% endif %}
+
+                {% if comments %}
+                    {{ render_pagination(pagination, fragment='#comments') }}
+                {% endif %}
+
+                {% if request.args.get('reply') %}
+                <div class="alert alert-dark">
+                    回复给 <strong>{{ request.args.get('author') }}</strong>:
+                    <a class="float-right" href="{{ url_for('.show_post', post_id=post.id) }}">Cancel</a>
+                </div>
+                {% endif %}
+
+            </div>
+            {% if post.can_comment %}
+            <div class="comment-form">
+                {{ wtf.quick_form(form) }}
+            </div>
+            {% else %}
+            <div class="tip"><h5>禁止评论.</h5></div>
+            {% endif %}
+
+        </div>
+        <div class="col-sm-4 sidebar">
+            {% include "blog/_sidebar.html" %}
+        </div>
+    </div>
+
+{% endblock %}
