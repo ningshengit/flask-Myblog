@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% from 'bootstrap/pagination.html' import render_pagination %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block app_content %}
+    <div class="page-header">
+        <h1>{{ post.title }}</h1>
+        <small>
+            Tag: <a href="">{{ post.tag.name }}</a><br>
+            Date: {{ post.timestamp }}
+        </small>
+    </div>
+    <div class="row">
+        <div class="col-sm-8">
+
+            {{ post.body|safe }}
+            <hr>
+            <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target=".postLinkModal">Share
+            </button>
+
+
+            <!-- share modal -->
+            <div class="modal fade postLinkModal" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel"
+                 aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Permalink</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <input type="text" class="form-control"
+                                       value="{{ url_for('.show_post', post_id=post.id, _external=True) }}" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-sm-4 sidebar">
+            {% include "blog/_sidebar.html" %}
+        </div>
+    </div>
+{% endblock %}
