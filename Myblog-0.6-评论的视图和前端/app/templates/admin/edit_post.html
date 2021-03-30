@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block title %}Edit Post{% endblock %}
+
+{% block app_content %}
+    <div class="page-header">
+        <h1>Edit Post</h1>
+    </div>
+    {{ wtf.quick_form(form) }}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='ckeditor/ckeditor.js') }}"></script>
+
+{% endblock %}
